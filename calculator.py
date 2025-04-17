@@ -2,46 +2,44 @@ from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
 
-# Define your functions
-def add(x, y): return x + y
-def subtract(x, y): return x - y
-def multiply(x, y): return x * y
-def divide(x, y): return "Error! Division by zero." if y == 0 else x / y
-
-# HTML form
-form_html = '''
-    <h2>Simple Web Calculator</h2>
-    <form method="post">
-        Number 1: <input type="text" name="num1"><br>
-        Number 2: <input type="text" name="num2"><br>
-        Operation:
-        <select name="operation">
-            <option value="add">Add</option>
-            <option value="subtract">Subtract</option>
-            <option value="multiply">Multiply</option>
-            <option value="divide">Divide</option>
-        </select><br>
-        <input type="submit" value="Calculate">
-    </form>
-    {% if result is not none %}
-        <h3>Result: {{ result }}</h3>
-    {% endif %}
+form = '''
+<h2>Calculator</h2>
+<form method="post">
+  Number 1: <input type="text" name="x"><br>
+  Number 2: <input type="text" name="y"><br>
+  Operation:
+  <select name="op">
+    <option value="add">Add</option>
+    <option value="sub">Subtract</option>
+    <option value="mul">Multiply</option>
+    <option value="div">Divide</option>
+  </select><br>
+  <input type="submit" value="Calculate">
+</form>
+{% if result is not none %}
+<h3>Result: {{ result }}</h3>
+{% endif %}
 '''
 
 @app.route("/", methods=["GET", "POST"])
-def calculator():
+def calc():
     result = None
     if request.method == "POST":
         try:
-            x = float(request.form["num1"])
-            y = float(request.form["num2"])
-            op = request.form["operation"]
-
-            if op == "add": result = add(x, y)
-            elif op == "subtract": result = subtract(x, y)
-            elif op == "multiply": result = multiply(x, y)
-            elif op == "divide": result = divide(x, y)
+            x = float(request.form["x"])
+            y = float(request.form["y"])
+            op = request.form["op"]
+            if op == "add":
+                result = x + y
+            elif op == "sub":
+                result = x - y
+            elif op == "mul":
+                result = x * y
+            elif op == "div":
+                result = "Error" if y == 0 else x / y
         except:
-            result = "Invalid input"
-    return render_template_string(form_html, result=result)
+            result = "Invalid input!"
+    return render_template_string(form, result=result)
 
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
