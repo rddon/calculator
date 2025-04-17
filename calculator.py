@@ -1,45 +1,36 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-form = '''
-<h2>Calculator</h2>
-<form method="post">
-  Number 1: <input type="text" name="x"><br>
-  Number 2: <input type="text" name="y"><br>
-  Operation:
-  <select name="op">
-    <option value="add">Add</option>
-    <option value="sub">Subtract</option>
-    <option value="mul">Multiply</option>
-    <option value="div">Divide</option>
-  </select><br>
-  <input type="submit" value="Calculate">
-</form>
-{% if result is not none %}
-<h3>Result: {{ result }}</h3>
-{% endif %}
-'''
+@app.route('/')
+def home():
+    return "Welcome to the Web Calculator API! Use /add, /subtract, /multiply, or /divide with GET parameters 'a' and 'b'."
 
-@app.route("/", methods=["GET", "POST"])
-def calc():
-    result = None
-    if request.method == "POST":
-        try:
-            x = float(request.form["x"])
-            y = float(request.form["y"])
-            op = request.form["op"]
-            if op == "add":
-                result = x + y
-            elif op == "sub":
-                result = x - y
-            elif op == "mul":
-                result = x * y
-            elif op == "div":
-                result = "Error" if y == 0 else x / y
-        except:
-            result = "Invalid input!"
-    return render_template_string(form, result=result)
+@app.route('/add')
+def add():
+    a = float(request.args.get('a', 0))
+    b = float(request.args.get('b', 0))
+    return jsonify(result=a + b)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+@app.route('/subtract')
+def subtract():
+    a = float(request.args.get('a', 0))
+    b = float(request.args.get('b', 0))
+    return jsonify(result=a - b)
+
+@app.route('/multiply')
+def multiply():
+    a = float(request.args.get('a', 0))
+    b = float(request.args.get('b', 0))
+    return jsonify(result=a * b)
+
+@app.route('/divide')
+def divide():
+    a = float(request.args.get('a', 0))
+    b = float(request.args.get('b', 1))  # avoid division by zero
+    if b == 0:
+        return jsonify(error="Division by zero is not allowed"), 400
+    return jsonify(result=a / b)
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
